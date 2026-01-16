@@ -17,6 +17,6 @@ jobs:
 
       - name: Push to target repository
         run: |
-          git remote add mirror https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/TARGET_OWNER/TARGET_REPO.git
+          git remote add mirror https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/Subhan-Khaliq/I-DEV-702-INT-7-1-trinitydevweb-8.git
           git push mirror --all
           git push mirror --tags
