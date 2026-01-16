@@ -1,0 +1,188 @@
+import React, { useEffect, useState } from 'react';
+import api from '../../services/api';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+
+const CustomerOrders = () => {
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+
+    const fetchOrders = async () => {
+        try {
+            const { data } = await api.get('/invoices');
+            setOrders(data);
+        } catch (error) {
+            console.error("Failed to fetch orders", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchOrderDetails = async (id) => {
+        try {
+            const { data } = await api.get(`/invoices/${id}`);
+            setSelectedOrder(data);
+        } catch (error) {
+            console.error("Failed to fetch order details", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
+    if (loading) return <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading your orders...</div>;
+
+    return (
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '2rem', marginBottom: '2.5rem' }}>Order History</h2>
+
+            {orders.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '5rem 2rem' }}>
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        background: 'var(--bg-color)',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 1.5rem',
+                        color: 'var(--text-muted)'
+                    }}>
+                        <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    </div>
+                    <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>No orders found</h3>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>You haven't placed any orders yet. Start exploring our store!</p>
+                    <Link to="/">
+                        <Button variant="primary">Browse Products</Button>
+                    </Link>
+                </div>
+            ) : (
+                <div style={{ display: 'grid', gap: '1.5rem' }}>
+                    {orders.map(order => (
+                        <Card key={order._id} style={{ padding: '0', overflow: 'hidden' }}>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '1.5rem 2rem',
+                                background: 'var(--bg-color)',
+                                borderBottom: selectedOrder?._id === order._id ? '1px solid var(--border-color)' : 'none'
+                            }}>
+                                <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Order Number</div>
+                                        <div style={{ fontWeight: '700', color: 'var(--text-main)' }}>#{order._id.slice(-8).toUpperCase()}</div>
+                                    </div>
+                                    <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '2rem' }}>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Date Placed</div>
+                                        <div style={{ fontWeight: '500' }}>{new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Total Amount</div>
+                                        <div style={{ fontWeight: '800', fontSize: '1.125rem', color: 'var(--text-main)' }}>${order.totalAmount.toFixed(2)}</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right', minWidth: '100px' }}>
+                                        <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Status</div>
+                                        <span style={{
+                                            display: 'inline-block',
+                                            padding: '4px 12px',
+                                            borderRadius: '999px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '700',
+                                            background: order.paymentStatus === 'paid' ? '#dcfce7' : '#fee2e2',
+                                            color: order.paymentStatus === 'paid' ? '#166534' : '#991b1b',
+                                            textTransform: 'uppercase'
+                                        }}>
+                                            {order.paymentStatus}
+                                        </span>
+                                    </div>
+                                    <Button
+                                        variant={selectedOrder?._id === order._id ? 'primary' : 'outline'}
+                                        size="sm"
+                                        onClick={() => selectedOrder?._id === order._id ? setSelectedOrder(null) : fetchOrderDetails(order._id)}
+                                        style={{ minWidth: '120px' }}
+                                    >
+                                        {selectedOrder?._id === order._id ? 'Hide Details' : 'View Details'}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {selectedOrder && selectedOrder._id === order._id && (
+                                <div style={{ padding: '2rem', background: 'var(--surface-color)' }}>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1.25rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                        Order Items
+                                    </h4>
+                                    <div style={{ display: 'grid', gap: '1rem' }}>
+                                        {selectedOrder.items.map(item => (
+                                            <div key={item._id} style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                padding: '1rem',
+                                                background: 'var(--bg-color)',
+                                                borderRadius: 'var(--radius)',
+                                                border: '1px solid var(--border-color)'
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                    <div style={{
+                                                        width: '48px',
+                                                        height: '48px',
+                                                        background: 'var(--surface-color)',
+                                                        borderRadius: '8px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        border: '1px solid var(--border-color)'
+                                                    }}>
+                                                        <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontWeight: '600', fontSize: '0.925rem' }}>{item.productId?.name}</div>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Quantity: {item.quantity} × ${item.priceAtPurchase.toFixed(2)}</div>
+                                                    </div>
+                                                </div>
+                                                <div style={{ fontWeight: '700', fontSize: '1rem' }}>${item.subtotal.toFixed(2)}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div style={{
+                                        marginTop: '2rem',
+                                        paddingTop: '1.5rem',
+                                        borderTop: '2px dashed var(--border-color)',
+                                        display: 'flex',
+                                        justifyContent: 'flex-end'
+                                    }}>
+                                        <div style={{ width: '250px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                                                <span>Subtotal</span>
+                                                <span>${order.totalAmount.toFixed(2)}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                                                <span>Shipping</span>
+                                                <span style={{ color: '#166534', fontWeight: '600' }}>Free</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                                                <span style={{ fontWeight: '700' }}>Order Total</span>
+                                                <span style={{ fontWeight: '800', fontSize: '1.25rem', color: 'var(--primary-color)' }}>${order.totalAmount.toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </Card>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default CustomerOrders;
