@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
@@ -7,13 +7,14 @@ const productSchema = new mongoose.Schema(
     brand: String,
     picture: String,
     category: String,
-    nutritionalInformation: String,
+    nutritionalInformation: { type: Map, of: String }, // Store key-value pairs like Energy: 100kcal
     availableQuantity: { type: Number, default: 0 },
     barcode: { type: String, unique: true },
-    openFoodFactsData: { type: Object }, // JSON
+    openFoodFactsData: { type: Object }, // Full JSON from API
     lastUpdatedFromAPI: Date,
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Product", productSchema);
+const Product = mongoose.model("Product", productSchema);
+export default Product;
