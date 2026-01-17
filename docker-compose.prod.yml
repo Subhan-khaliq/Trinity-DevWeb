@@ -6,7 +6,7 @@ services:
     volumes:
       - ./frontend/coverage:/app/frontend-coverage
     env_file:
-      - ./backend/.env.production
+      - .env.production
     ports:
       - "5001:3000"
     environment:
