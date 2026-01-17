@@ -11,7 +11,7 @@ const Products = () => {
     const fetchProducts = async () => {
         try {
             const { data } = await api.get('/products');
-            setProducts(data);
+            setProducts(data.products || []);
         } catch (error) {
             console.error("Failed to fetch products", error);
         } finally {
@@ -40,9 +40,25 @@ const Products = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2>Product Management</h2>
-                <Link to="/admin/products/new">
-                    <Button variant="primary">Add Product</Button>
-                </Link>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <Button variant="outline" onClick={async () => {
+                        const barcode = prompt('Enter product barcode:');
+                        if (barcode) {
+                            setLoading(true);
+                            try {
+                                await api.post('/products/sync', { barcode });
+                                fetchProducts();
+                            } catch (error) {
+                                alert(error.response?.data?.message || 'Failed to sync product');
+                            } finally {
+                                setLoading(false);
+                            }
+                        }
+                    }}>Sync via Barcode</Button>
+                    <Link to="/admin/products/new">
+                        <Button variant="primary">Add Product</Button>
+                    </Link>
+                </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
