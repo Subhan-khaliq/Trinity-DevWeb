@@ -2,24 +2,20 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER_LOWERCASE}/trinity-backend:latest
     volumes:
       - ./frontend/coverage:/app/frontend-coverage
     env_file:
       - ./backend/.env.production
     ports:
-      - "5001:5001"
+      - "5001:3000"
     environment:
       - NODE_ENV=production
       - DOCKER_ENV=true
     restart: always
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER_LOWERCASE}/trinity-frontend:latest
     ports:
       - "80:80"
     depends_on:
