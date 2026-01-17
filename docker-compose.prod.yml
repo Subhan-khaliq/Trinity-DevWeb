@@ -3,15 +3,10 @@ version: '3.8'
 services:
   backend:
     image: ghcr.io/subhan-khaliq/trinity-backend:latest
-    volumes:
-      - ./frontend/coverage:/app/frontend-coverage
     env_file:
       - .env.production
     ports:
-      - "5001:3000"
-    environment:
-      - NODE_ENV=production
-      - DOCKER_ENV=true
+      - "5001:5001" # Match container port with host
     restart: always
 
   frontend:
