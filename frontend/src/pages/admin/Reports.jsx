@@ -56,7 +56,12 @@ const Reports = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2>Analytics Reports</h2>
-                <Button variant="primary" onClick={handleGenerate}>Generate Report</Button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <a href="http://localhost:5001/coverage" target="_blank" rel="noopener noreferrer">
+                        <Button variant="secondary">Specs Coverage</Button>
+                    </a>
+                    <Button variant="primary" onClick={handleGenerate}>Generate Report</Button>
+                </div>
             </div>
 
             {reports.length === 0 ? (
@@ -147,6 +152,64 @@ const Reports = () => {
                                                 <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
                                                 <Legend />
                                             </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* Low Stock Alert */}
+                                {report.data.lowStockProducts && report.data.lowStockProducts.length > 0 && (
+                                    <div style={{ height: '350px', background: 'var(--surface-color)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                        <h4 style={{ marginBottom: '1.5rem', fontSize: '1rem', color: '#e53e3e' }}>Low Stock Inventory (Units Left)</h4>
+                                        <ResponsiveContainer width="100%" height="80%">
+                                            <BarChart data={report.data.lowStockProducts}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                                                <YAxis tick={{ fontSize: 12 }} />
+                                                <Tooltip />
+                                                <Bar dataKey="value" fill="#fc8181" radius={[4, 4, 0, 0]} name="Stock Level" barSize={30} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* Payment Methods */}
+                                {report.data.paymentMethodDistribution && report.data.paymentMethodDistribution.length > 0 && (
+                                    <div style={{ height: '350px', background: 'var(--surface-color)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                        <h4 style={{ marginBottom: '1.5rem', fontSize: '1rem', color: 'var(--text-main)' }}>Payment Method Usage</h4>
+                                        <ResponsiveContainer width="100%" height="80%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={report.data.paymentMethodDistribution}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    outerRadius={80}
+                                                    fill="#8884d8"
+                                                    dataKey="value"
+                                                    label={({ name }) => `${name}`}
+                                                >
+                                                    {report.data.paymentMethodDistribution.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                                <Legend />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+
+                                {/* User Growth */}
+                                {report.data.userGrowth && report.data.userGrowth.length > 0 && (
+                                    <div style={{ height: '350px', background: 'var(--surface-color)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                        <h4 style={{ marginBottom: '1.5rem', fontSize: '1rem', color: 'var(--text-main)' }}>New User Growth (Last 7 Days)</h4>
+                                        <ResponsiveContainer width="100%" height="80%">
+                                            <LineChart data={report.data.userGrowth}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                                <XAxis dataKey="_id" tick={{ fontSize: 12 }} />
+                                                <YAxis tick={{ fontSize: 12 }} />
+                                                <Tooltip />
+                                                <Line type="stepAfter" dataKey="count" stroke="#38a169" strokeWidth={3} name="New Users" dot={{ r: 5 }} />
+                                            </LineChart>
                                         </ResponsiveContainer>
                                     </div>
                                 )}

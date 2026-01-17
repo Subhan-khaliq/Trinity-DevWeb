@@ -68,6 +68,7 @@ const Layout = () => {
                                 </div>
                             )}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <Link to="/profile" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Profile</Link>
                                 <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-main)' }}>Hi, {user.firstName}</span>
                                 <Button variant="outline" onClick={logout} size="sm" style={{ padding: '0.4rem 0.8rem' }}>Logout</Button>
                             </div>

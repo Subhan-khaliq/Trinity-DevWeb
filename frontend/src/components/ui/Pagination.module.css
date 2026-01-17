@@ -1,0 +1,66 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 4rem;
+    padding-bottom: 2rem;
+}
+
+.pages {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.button {
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-main);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.button:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pageButton {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-main);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pageButton:hover:not(.active) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}

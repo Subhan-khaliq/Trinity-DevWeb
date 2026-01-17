@@ -3,56 +3,58 @@ import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
+import Pagination from '../../components/ui/Pagination';
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const { addToCart } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    const fetchProducts = async (page = 1) => {
+        setLoading(true);
+        try {
+            const { data } = await api.get(`/products?page=${page}&limit=4`);
+            setProducts(data.products || []);
+            setTotalPages(data.totalPages || 1);
+            setCurrentPage(data.currentPage || 1);
+        } catch (error) {
+            console.error("Failed to fetch products", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (user && user.role === 'admin') {
             navigate('/admin');
             return;
         }
-
-        const fetchProducts = async () => {
-            try {
-                const { data } = await api.get('/products');
-                setProducts(data);
-                setFilteredProducts(data);
-            } catch (error) {
-                console.error("Failed to fetch products", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
+        fetchProducts(1);
     }, [user, navigate]);
 
-    useEffect(() => {
-        let result = products;
+    const handlePageChange = (newPage) => {
+        fetchProducts(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-        if (searchQuery) {
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                p.brand?.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-        }
-
-        if (selectedCategory) {
-            result = result.filter(p => p.category === selectedCategory);
-        }
-
-        setFilteredProducts(result);
-    }, [searchQuery, selectedCategory, products]);
+    // Client-side filtering on the current page's products (Simple approach for 4 items)
+    // Note: In a real app, filtering should also be server-side if paginated.
+    // For now, I'll keep it simple as the user asked for 4 products per page.
+    const filteredProducts = products.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.brand?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategory ? p.category === selectedCategory : true;
+        return matchesSearch && matchesCategory;
+    });
 
     const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
 
@@ -94,14 +96,6 @@ const Home = () => {
                             fontSize: '0.925rem',
                             outline: 'none',
                             transition: 'all 0.2s ease'
-                        }}
-                        onFocus={(e) => {
-                            e.target.style.borderColor = 'var(--primary-color)';
-                            e.target.style.boxShadow = '0 0 0 4px rgba(99, 102, 241, 0.1)';
-                        }}
-                        onBlur={(e) => {
-                            e.target.style.borderColor = 'var(--border-color)';
-                            e.target.style.boxShadow = 'none';
                         }}
                     />
                 </div>
@@ -148,8 +142,8 @@ const Home = () => {
 
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '3rem'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: '2rem'
             }}>
                 {filteredProducts.length === 0 ? (
                     <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '6rem 2rem', background: 'var(--surface-color)', borderRadius: 'var(--radius)', border: '1px dashed var(--border-color)' }}>
@@ -159,11 +153,11 @@ const Home = () => {
                     </div>
                 ) : (
                     filteredProducts.map(product => (
-                        <Card key={product._id} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1rem' }}>
+                        <Card key={product._id} style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0.75rem' }}>
                             <div style={{
-                                height: '240px',
+                                height: '200px',
                                 background: 'var(--bg-color)',
-                                marginBottom: '1.25rem',
+                                marginBottom: '1rem',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -172,35 +166,31 @@ const Home = () => {
                                 border: '1px solid var(--border-color)'
                             }}>
                                 {product.picture ? (
-                                    <img src={product.picture} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '1.5rem', transition: 'transform 0.5s ease' }} onMouseOver={e => e.target.style.transform = 'scale(1.05)'} onMouseOut={e => e.target.style.transform = 'scale(1)'} />
+                                    <img src={product.picture} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '1rem', transition: 'transform 0.5s ease' }} />
                                 ) : (
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1' }}>
-                                        <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <span style={{ fontSize: '0.875rem' }}>No Image</span>
+                                        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span style={{ fontSize: '0.75rem' }}>No Image</span>
                                     </div>
                                 )}
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '0 0.5rem 0.5rem' }}>
-                                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '0 0.25rem 0.25rem' }}>
+                                <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
                                     {product.brand || 'Trinity Exclusive'}
                                 </div>
-                                <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', minHeight: '3.1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.25' }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem', minHeight: '2.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.25' }}>
                                     {product.name}
                                 </h3>
-                                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', paddingTop: '1rem' }}>
-                                    <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-main)' }}>${product.price}</span>
+                                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', paddingTop: '0.75rem' }}>
+                                    <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>${product.price}</span>
                                     <Button
                                         variant="primary"
+                                        size="sm"
                                         style={{ flex: 1 }}
                                         onClick={() => addToCart(product)}
                                         disabled={product.availableQuantity < 1}
                                     >
-                                        {product.availableQuantity > 0 ? (
-                                            <>
-                                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                                Add
-                                            </>
-                                        ) : 'Out of Stock'}
+                                        {product.availableQuantity > 0 ? 'Add' : 'Out of Stock'}
                                     </Button>
                                 </div>
                             </div>
@@ -208,6 +198,12 @@ const Home = () => {
                     ))
                 )}
             </div>
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
         </div>
     );
 };
