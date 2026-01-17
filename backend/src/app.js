@@ -8,6 +8,11 @@ import invoiceRoutes from "./routes/invoice.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 import authRoutes from './routes/auth.routes.js';
 import { swaggerUi, specs } from './config/swagger.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -30,5 +35,36 @@ app.use("/api/invoices", invoiceRoutes);
 // app.use("/api/invoice-items", invoiceItemRoutes);
 app.use("/api/reports", reportRoutes);
 app.use('/api/auth', authRoutes);
+
+// Coverage Reports Dashboard
+app.get('/coverage', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/coverage.html'));
+});
+
+app.get('/coverage/debug', (req, res) => {
+  const bExists = path.resolve(backendCoveragePath);
+  const fExists = path.resolve(frontendCoveragePath);
+  res.json({
+    dockerEnv: process.env.DOCKER_ENV,
+    backendPath: bExists,
+    frontendPath: fExists
+  });
+});
+
+// Static assets for reports
+const backendCoveragePath = path.resolve(__dirname, '../coverage');
+const frontendCoveragePath = process.env.DOCKER_ENV === 'true'
+  ? '/app/frontend-coverage/lcov-report'
+  : path.resolve(__dirname, '../../frontend/coverage/lcov-report');
+
+console.log('--- Coverage Diagnostics ---');
+console.log(`DOCKER_ENV: ${process.env.DOCKER_ENV}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`Backend Path: ${backendCoveragePath}`);
+console.log(`Frontend Path: ${frontendCoveragePath}`);
+console.log('---------------------------');
+
+app.use('/coverage/backend-report', express.static(backendCoveragePath));
+app.use('/coverage/frontend-report', express.static(frontendCoveragePath));
 
 export default app;

@@ -2,6 +2,7 @@ import Invoice from '../models/Invoice.js';
 import InvoiceItem from '../models/InvoiceItem.js';
 import Product from '../models/Product.js';
 import Report from '../models/Report.js';
+import User from '../models/User.js';
 
 export const generateReport = async (req, res) => {
     try {
@@ -66,6 +67,35 @@ export const generateReport = async (req, res) => {
             { $project: { name: { $ifNull: ["$_id", "Uncategorized"] }, value: 1, _id: 0 } }
         ]);
 
+        // Low Stock Products (availableQuantity < 20)
+        const lowStockProducts = await Product.find({ availableQuantity: { $lt: 20 } })
+            .select('name availableQuantity')
+            .sort({ availableQuantity: 1 })
+            .limit(10);
+
+        const lowStockData = lowStockProducts.map(p => ({
+            name: p.name,
+            value: p.availableQuantity
+        }));
+
+        // Payment Method Distribution
+        const paymentMethodDistribution = await Invoice.aggregate([
+            { $group: { _id: "$paymentMethod", value: { $sum: 1 } } },
+            { $project: { name: { $ifNull: ["$_id", "Unknown"] }, value: 1, _id: 0 } }
+        ]);
+
+        // User Growth (Last 7 Days)
+        const userGrowth = await User.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
         const reportData = {
             totalRevenue: totalSales[0]?.total || 0,
             totalOrders: countInvoices,
@@ -73,6 +103,9 @@ export const generateReport = async (req, res) => {
             dailySales: dailySales,
             topProducts: topProducts,
             categoryRevenue: categoryRevenue,
+            lowStockProducts: lowStockData,
+            paymentMethodDistribution: paymentMethodDistribution,
+            userGrowth: userGrowth,
             generatedAt: new Date()
         };
 

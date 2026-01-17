@@ -26,9 +26,35 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    // Add filtering helper later if needed
-    const products = await Product.find();
-    res.json(products);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    // If no pagination requested, return all
+    if (!page && !limit) {
+      const products = await Product.find().sort({ createdAt: -1 });
+      return res.json({
+        products,
+        currentPage: 1,
+        totalPages: 1,
+        totalProducts: products.length
+      });
+    }
+
+    const skip = ((page || 1) - 1) * (limit || 12);
+    const finalLimit = limit || 12;
+
+    const total = await Product.countDocuments();
+    const products = await Product.find()
+      .skip(skip)
+      .limit(finalLimit)
+      .sort({ createdAt: -1 });
+
+    res.json({
+      products,
+      currentPage: page || 1,
+      totalPages: Math.ceil(total / finalLimit),
+      totalProducts: total
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

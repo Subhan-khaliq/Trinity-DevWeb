@@ -15,6 +15,7 @@ import Orders from './pages/admin/Orders';
 import Reports from './pages/admin/Reports';
 import CustomerOrders from './pages/public/CustomerOrders';
 import Customers from './pages/admin/Customers';
+import Profile from './pages/public/Profile';
 import './index.css';
 
 // Protected Route Component
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/orders" element={<ProtectedRoute><CustomerOrders /></ProtectedRoute>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
                 {/* Protected Admin Routes */}
                 <Route
