@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER_LOWERCASE}/trinity-backend:latest
+    image: ghcr.io/subhan-khaliq/trinity-backend:latest
     volumes:
       - ./frontend/coverage:/app/frontend-coverage
     env_file:
@@ -15,7 +15,7 @@ services:
     restart: always
 
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER_LOWERCASE}/trinity-frontend:latest
+    image: ghcr.io/subhan-khaliq/trinity-frontend:latest
     ports:
       - "80:80"
     depends_on:
