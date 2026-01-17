@@ -57,7 +57,7 @@ const Reports = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2>Analytics Reports</h2>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <a href="http://13.62.5.147:5001/coverage" target="_blank" rel="noopener noreferrer">
+                    <a href="http://13.48.178.167:5001/coverage" target="_blank" rel="noopener noreferrer">
                         <Button variant="secondary">Specs Coverage</Button>
                     </a>
                     <Button variant="primary" onClick={handleGenerate}>Generate Report</Button>
