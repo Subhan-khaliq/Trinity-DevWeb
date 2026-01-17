@@ -1,9 +1,16 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import Profile from './Profile';
-import axios from 'axios';
+jest.mock('../../services/api', () => ({
+    get: jest.fn(),
+    put: jest.fn(),
+    interceptors: {
+        request: { use: jest.fn() },
+        response: { use: jest.fn() }
+    }
+}));
 
-jest.mock('axios');
+import Profile from './Profile';
+import api from '../../services/api';
 
 describe('Profile Component', () => {
     const mockUser = {
@@ -14,7 +21,7 @@ describe('Profile Component', () => {
     };
 
     beforeEach(() => {
-        axios.get.mockResolvedValue({ data: mockUser });
+        api.get.mockResolvedValue({ data: mockUser });
         localStorage.setItem('token', 'test-token');
     });
 
@@ -37,8 +44,8 @@ describe('Profile Component', () => {
         expect(screen.getByText('Passwords do not match')).toBeInTheDocument();
     });
 
-    it('calls axios.put on submit', async () => {
-        axios.put.mockResolvedValue({ data: { ...mockUser, firstName: 'Johnny' } });
+    it('calls api.put on submit', async () => {
+        api.put.mockResolvedValue({ data: { ...mockUser, firstName: 'Johnny' } });
         render(<Profile />);
         await waitFor(() => screen.getByDisplayValue('John'));
 
@@ -46,10 +53,9 @@ describe('Profile Component', () => {
         fireEvent.click(screen.getByText('Update Profile'));
 
         await waitFor(() => {
-            expect(axios.put).toHaveBeenCalledWith(
-                expect.stringContaining('/api/users/profile/me'),
-                expect.objectContaining({ firstName: 'Johnny' }),
-                expect.any(Object)
+            expect(api.put).toHaveBeenCalledWith(
+                '/users/profile/me',
+                expect.objectContaining({ firstName: 'Johnny' })
             );
             expect(screen.getByText('Profile updated successfully!')).toBeInTheDocument();
         });

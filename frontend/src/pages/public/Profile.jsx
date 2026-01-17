@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import styles from './Profile.module.css';
 
 const Profile = () => {
@@ -17,10 +17,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5001/api/users/profile/me', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await api.get('/users/profile/me');
                 setUser(prev => ({ ...prev, ...res.data }));
             } catch (err) {
                 setMessage({ type: 'error', text: 'Failed to fetch profile' });
@@ -42,10 +39,7 @@ const Profile = () => {
 
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.put('http://localhost:5001/api/users/profile/me', user, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.put('/users/profile/me', user);
             setMessage({ type: 'success', text: 'Profile updated successfully!' });
             setUser(prev => ({ ...prev, ...res.data, password: '', confirmPassword: '' }));
         } catch (err) {
