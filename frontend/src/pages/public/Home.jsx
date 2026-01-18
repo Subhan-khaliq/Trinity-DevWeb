@@ -147,7 +147,7 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div style={{
+                <div id="tour-products-catalog" style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
                     gap: '2rem'

@@ -25,7 +25,7 @@ const Layout = () => {
                 zIndex: 100,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
             }}>
-                <div style={{ fontWeight: '700', fontSize: '1.5rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>
+                <div id="tour-logo" style={{ fontWeight: '700', fontSize: '1.5rem', color: 'var(--primary-color)', fontFamily: 'var(--font-heading)' }}>
                     <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         Trinity Store
                     </Link>
@@ -35,7 +35,7 @@ const Layout = () => {
                         <>
                             <Link to="/" style={{ color: 'var(--text-muted)', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Home</Link>
                             <Link to="/orders" style={{ color: 'var(--text-muted)', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>My Orders</Link>
-                            <Link to="/cart" style={{ color: 'var(--text-muted)', position: 'relative', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>
+                            <Link id="tour-cart" to="/cart" style={{ color: 'var(--text-muted)', position: 'relative', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>
                                 Cart
                                 {totalItems > 0 && (
                                     <span style={{
@@ -60,7 +60,7 @@ const Layout = () => {
                         <>
                             {user.role === 'admin' && (
                                 <div style={{ display: 'flex', gap: '1.25rem', paddingRight: '1rem', borderRight: '1px solid var(--border-color)' }}>
-                                    <Link to="/admin" style={{ color: 'var(--text-muted)', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Dashboard</Link>
+                                    <Link id="tour-dashboard" to="/admin" style={{ color: 'var(--text-muted)', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Dashboard</Link>
                                     <Link to="/admin/products" style={{ color: 'var(--text-muted)', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Products</Link>
                                     <Link to="/admin/orders" style={{ color: 'var(--text-muted)', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Orders</Link>
                                     <Link to="/admin/customers" style={{ color: 'var(--text-muted)', fontWeight: '500' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Customers</Link>
@@ -68,7 +68,7 @@ const Layout = () => {
                                 </div>
                             )}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <Link to="/profile" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Profile</Link>
+                                <Link id="tour-profile" to="/profile" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-muted)' }} onMouseOver={e => e.target.style.color = 'var(--primary-color)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>Profile</Link>
                                 <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-main)' }}>Hi, {user.firstName}</span>
                                 <Button variant="outline" onClick={logout} size="sm" style={{ padding: '0.4rem 0.8rem' }}>Logout</Button>
                             </div>

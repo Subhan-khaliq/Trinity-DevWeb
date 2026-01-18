@@ -17,6 +17,7 @@ import CustomerOrders from './pages/public/CustomerOrders';
 import Customers from './pages/admin/Customers';
 import Profile from './pages/public/Profile';
 import ProductDetail from './pages/public/ProductDetail';
+import GuidedTour from './components/GuidedTour';
 import './index.css';
 
 // Protected Route Component
@@ -31,11 +32,21 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 };
 
 function App() {
+  const [runTour, setRunTour] = React.useState(false);
+
+  React.useEffect(() => {
+    const hasTakenTour = localStorage.getItem('hasTakenTour');
+    if (!hasTakenTour) {
+      setRunTour(true);
+    }
+  }, []);
+
   return (
     <Router>
       <ThemeProvider>
         <AuthProvider>
           <CartProvider>
+            <GuidedTour run={runTour} setRun={setRunTour} />
             <Routes>
               <Route element={<Layout />}>
                 {/* Public Routes */}
