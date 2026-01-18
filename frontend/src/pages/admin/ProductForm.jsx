@@ -17,7 +17,11 @@ const ProductForm = () => {
         category: '',
         availableQuantity: '',
         picture: '',
-        barcode: ''
+        barcode: '',
+        ingredients: '',
+        isGlutenFree: false,
+        isVegan: false,
+        isVegetarian: false
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -34,7 +38,11 @@ const ProductForm = () => {
                         category: data.category || '',
                         availableQuantity: data.availableQuantity || 0,
                         picture: data.picture || '',
-                        barcode: data.barcode || ''
+                        barcode: data.barcode || '',
+                        ingredients: data.ingredients || '',
+                        isGlutenFree: data.isGlutenFree || false,
+                        isVegan: data.isVegan || false,
+                        isVegetarian: data.isVegetarian || false
                     });
                 } catch (err) {
                     setError('Failed to fetch product details details');
@@ -45,8 +53,8 @@ const ProductForm = () => {
     }, [id, isEditMode]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
     const handleSubmit = async (e) => {
@@ -86,6 +94,33 @@ const ProductForm = () => {
                         <Input label="Brand" name="brand" value={formData.brand} onChange={handleChange} />
                         <Input label="Category" name="category" value={formData.category} onChange={handleChange} />
                     </div>
+
+                    <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                            <input type="checkbox" name="isGlutenFree" checked={formData.isGlutenFree} onChange={handleChange} />
+                            Gluten-Free
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                            <input type="checkbox" name="isVegan" checked={formData.isVegan} onChange={handleChange} />
+                            Vegan
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
+                            <input type="checkbox" name="isVegetarian" checked={formData.isVegetarian} onChange={handleChange} />
+                            Vegetarian
+                        </label>
+                    </div>
+
+                    <div style={{ marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.5rem' }}>Ingredients</label>
+                        <textarea
+                            name="ingredients"
+                            value={formData.ingredients}
+                            onChange={handleChange}
+                            rows="4"
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius)', border: '1px solid var(--border-color)', outline: 'none', background: 'var(--surface-color)', color: 'var(--text-main)' }}
+                        />
+                    </div>
+
                     <Input label="Picture URL" name="picture" value={formData.picture} onChange={handleChange} placeholder="https://example.com/image.jpg" />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem', alignItems: 'start' }}>
                         <Input label="Barcode" name="barcode" value={formData.barcode} onChange={handleChange} />
@@ -107,7 +142,11 @@ const ProductForm = () => {
                                             name: data.name || prev.name,
                                             brand: data.brand || prev.brand,
                                             category: data.category || prev.category,
-                                            picture: data.picture || prev.picture
+                                            picture: data.picture || prev.picture,
+                                            ingredients: data.ingredients || prev.ingredients,
+                                            isGlutenFree: data.isGlutenFree || prev.isGlutenFree,
+                                            isVegan: data.isVegan || prev.isVegan,
+                                            isVegetarian: data.isVegetarian || prev.isVegetarian
                                         }));
                                     } catch (error) {
                                         alert(error.response?.data?.message || 'Failed to fetch details');
