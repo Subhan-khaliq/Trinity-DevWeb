@@ -111,6 +111,61 @@ const CustomerOrders = () => {
                                     >
                                         {selectedOrder?._id === order._id ? 'Hide Details' : 'View Details'}
                                     </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            // Ensure details are fetched if not already
+                                            let orderToPrint = order;
+                                            if (!order.items) {
+                                                const { data } = await api.get(`/invoices/${order._id}`);
+                                                orderToPrint = data;
+                                            }
+                                            const { generateReceipt } = await import('../../utils/receiptGenerator');
+                                            generateReceipt(orderToPrint);
+                                        }}
+                                        style={{ color: 'var(--primary-color)', fontWeight: '600' }}
+                                    >
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '6px' }}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Receipt
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            const btn = e.currentTarget;
+                                            const originalText = btn.innerHTML;
+                                            btn.innerHTML = 'Sending...';
+                                            btn.disabled = true;
+                                            try {
+                                                const { data } = await api.post(`/invoices/${order._id}/email`);
+                                                btn.innerHTML = 'Sent!';
+                                                if (data.previewUrl) console.log("Email Preview:", data.previewUrl);
+                                                setTimeout(() => {
+                                                    btn.innerHTML = originalText;
+                                                    btn.disabled = false;
+                                                }, 2000);
+                                            } catch (error) {
+                                                btn.innerHTML = 'Error';
+                                                btn.style.color = '#c53030';
+                                                setTimeout(() => {
+                                                    btn.innerHTML = originalText;
+                                                    btn.style.color = 'var(--primary-color)';
+                                                    btn.disabled = false;
+                                                }, 2000);
+                                            }
+                                        }}
+                                        style={{ color: 'var(--primary-color)', fontWeight: '600', minWidth: '80px' }}
+                                    >
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '6px' }}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Email
+                                    </Button>
                                 </div>
                             </div>
 

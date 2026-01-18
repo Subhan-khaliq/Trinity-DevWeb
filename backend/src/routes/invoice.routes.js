@@ -5,7 +5,8 @@ import {
   getInvoices,
   getInvoiceById,
   updateInvoice,
-  deleteInvoice
+  deleteInvoice,
+  emailReceipt
 } from "../controllers/invoice.controller.js";
 
 const router = express.Router();
@@ -155,5 +156,27 @@ router.put("/:id", authorize(['admin']), updateInvoice);
  *         description: Invoice deleted
  */
 router.delete("/:id", authorize(['admin']), deleteInvoice);
+
+/**
+ * @swagger
+ * /api/invoices/{id}/email:
+ *   post:
+ *     summary: Send receipt via email
+ *     tags: [Invoices]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Email sent successfully
+ *       404:
+ *         description: Invoice not found
+ */
+router.post("/:id/email", emailReceipt);
 
 export default router;
