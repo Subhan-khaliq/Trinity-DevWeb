@@ -138,19 +138,32 @@ const Reports = () => {
                                                     data={report.data.categoryRevenue}
                                                     cx="50%"
                                                     cy="50%"
-                                                    innerRadius={60}
-                                                    outerRadius={80}
+                                                    innerRadius={65}
+                                                    outerRadius={90}
                                                     fill="#8884d8"
                                                     paddingAngle={5}
                                                     dataKey="value"
-                                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                                    labelLine={true}
+                                                    label={({ name, percent }) => {
+                                                        const truncatedName = name.length > 15 ? `${name.substring(0, 15)}...` : name;
+                                                        return `${truncatedName} ${(percent * 100).toFixed(0)}%`;
+                                                    }}
                                                 >
                                                     {report.data.categoryRevenue.map((entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                     ))}
                                                 </Pie>
-                                                <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
-                                                <Legend />
+                                                <Tooltip
+                                                    formatter={(value, name) => [`$${value.toFixed(2)}`, name]}
+                                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                                                />
+                                                <Legend
+                                                    verticalAlign="bottom"
+                                                    height={36}
+                                                    formatter={(value) => {
+                                                        return <span style={{ fontSize: '10px' }}>{value.length > 20 ? `${value.substring(0, 20)}...` : value}</span>;
+                                                    }}
+                                                />
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </div>

@@ -19,6 +19,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app ./
 
 ENV NODE_ENV=production
+ENV DOCKER_ENV=true
 EXPOSE 5001
 
 CMD ["npm", "start"]
