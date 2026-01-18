@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export const generateReceipt = (order) => {
     const doc = new jsPDF();
@@ -43,7 +43,7 @@ export const generateReceipt = (order) => {
         tableRows.push(itemData);
     });
 
-    doc.autoTable({
+    autoTable(doc, {
         startY: 85,
         head: [tableColumn],
         body: tableRows,

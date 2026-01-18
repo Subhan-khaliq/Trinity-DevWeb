@@ -83,18 +83,18 @@ const CustomerOrders = () => {
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                                     <div style={{ textAlign: 'right' }}>
                                         <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Total Amount</div>
-                                        <div style={{ fontWeight: '800', fontSize: '1.125rem', color: 'var(--text-main)' }}>${order.totalAmount.toFixed(2)}</div>
+                                        <div style={{ fontWeight: '800', fontSize: '1rem', color: 'var(--text-main)' }}>${order.totalAmount.toFixed(2)}</div>
                                     </div>
-                                    <div style={{ textAlign: 'right', minWidth: '100px' }}>
+                                    <div style={{ textAlign: 'right', minWidth: '80px' }}>
                                         <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Status</div>
                                         <span style={{
                                             display: 'inline-block',
-                                            padding: '4px 12px',
+                                            padding: '2px 8px',
                                             borderRadius: '999px',
-                                            fontSize: '0.75rem',
+                                            fontSize: '0.7rem',
                                             fontWeight: '700',
                                             background: order.paymentStatus === 'paid' ? '#dcfce7' : '#fee2e2',
                                             color: order.paymentStatus === 'paid' ? '#166534' : '#991b1b',
@@ -103,69 +103,82 @@ const CustomerOrders = () => {
                                             {order.paymentStatus}
                                         </span>
                                     </div>
-                                    <Button
-                                        variant={selectedOrder?._id === order._id ? 'primary' : 'outline'}
-                                        size="sm"
-                                        onClick={() => selectedOrder?._id === order._id ? setSelectedOrder(null) : fetchOrderDetails(order._id)}
-                                        style={{ minWidth: '120px' }}
-                                    >
-                                        {selectedOrder?._id === order._id ? 'Hide Details' : 'View Details'}
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={async (e) => {
-                                            e.stopPropagation();
-                                            // Ensure details are fetched if not already
-                                            let orderToPrint = order;
-                                            if (!order.items) {
-                                                const { data } = await api.get(`/invoices/${order._id}`);
-                                                orderToPrint = data;
-                                            }
-                                            const { generateReceipt } = await import('../../utils/receiptGenerator');
-                                            generateReceipt(orderToPrint);
-                                        }}
-                                        style={{ color: 'var(--primary-color)', fontWeight: '600' }}
-                                    >
-                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '6px' }}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                        Receipt
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={async (e) => {
-                                            e.stopPropagation();
-                                            const btn = e.currentTarget;
-                                            const originalText = btn.innerHTML;
-                                            btn.innerHTML = 'Sending...';
-                                            btn.disabled = true;
-                                            try {
-                                                const { data } = await api.post(`/invoices/${order._id}/email`);
-                                                btn.innerHTML = 'Sent!';
-                                                if (data.previewUrl) console.log("Email Preview:", data.previewUrl);
-                                                setTimeout(() => {
-                                                    btn.innerHTML = originalText;
-                                                    btn.disabled = false;
-                                                }, 2000);
-                                            } catch (error) {
-                                                btn.innerHTML = 'Error';
-                                                btn.style.color = '#c53030';
-                                                setTimeout(() => {
-                                                    btn.innerHTML = originalText;
-                                                    btn.style.color = 'var(--primary-color)';
-                                                    btn.disabled = false;
-                                                }, 2000);
-                                            }
-                                        }}
-                                        style={{ color: 'var(--primary-color)', fontWeight: '600', minWidth: '80px' }}
-                                    >
-                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '6px' }}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                        </svg>
-                                        Email
-                                    </Button>
+
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '1rem' }}>
+                                        <Button
+                                            variant={selectedOrder?._id === order._id ? 'primary' : 'outline'}
+                                            size="sm"
+                                            onClick={() => selectedOrder?._id === order._id ? setSelectedOrder(null) : fetchOrderDetails(order._id)}
+                                            style={{ minWidth: '100px', fontSize: '0.8rem' }}
+                                        >
+                                            {selectedOrder?._id === order._id ? 'Hide' : 'Details'}
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                try {
+                                                    let orderToPrint = order;
+                                                    if (!order.items) {
+                                                        const { data } = await api.get(`/invoices/${order._id}`);
+                                                        orderToPrint = data;
+                                                    }
+                                                    const { generateReceipt } = await import('../../utils/receiptGenerator');
+                                                    generateReceipt(orderToPrint);
+                                                } catch (err) {
+                                                    console.error("PDF generation failed", err);
+                                                    alert("Could not generate PDF. Please try again.");
+                                                }
+                                            }}
+                                            style={{ color: 'var(--primary-color)', fontWeight: '600', fontSize: '0.8rem', padding: '0 8px' }}
+                                        >
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '4px' }}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            Receipt
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                const btn = e.currentTarget;
+                                                const originalContent = btn.innerHTML;
+                                                btn.innerHTML = '...';
+                                                btn.disabled = true;
+                                                try {
+                                                    const { data } = await api.post(`/invoices/${order._id}/email`);
+                                                    btn.innerHTML = 'Sent!';
+                                                    if (data.previewUrl) {
+                                                        console.log("Email Preview URL:", data.previewUrl);
+                                                        // Inform user about preview URL for test mode
+                                                        if (window.confirm("Test email sent! Would you like to view the preview URL in a new tab?")) {
+                                                            window.open(data.previewUrl, '_blank');
+                                                        }
+                                                    }
+                                                    setTimeout(() => {
+                                                        btn.innerHTML = originalContent;
+                                                        btn.disabled = false;
+                                                    }, 3000);
+                                                } catch (error) {
+                                                    btn.innerHTML = 'Error';
+                                                    btn.style.color = '#c53030';
+                                                    setTimeout(() => {
+                                                        btn.innerHTML = originalContent;
+                                                        btn.style.color = 'var(--primary-color)';
+                                                        btn.disabled = false;
+                                                    }, 3000);
+                                                }
+                                            }}
+                                            style={{ color: 'var(--primary-color)', fontWeight: '600', fontSize: '0.8rem', padding: '0 8px', minWidth: '60px' }}
+                                        >
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '4px' }}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                            </svg>
+                                            Email
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
 
