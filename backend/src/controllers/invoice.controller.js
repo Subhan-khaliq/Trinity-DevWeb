@@ -1,6 +1,8 @@
 import Invoice from "../models/Invoice.js";
 import InvoiceItem from "../models/InvoiceItem.js";
 import Product from "../models/Product.js";
+import { sendReceiptEmail } from "../utils/emailService.js";
+import User from "../models/User.js";
 
 export const createInvoice = async (req, res) => {
   try {
@@ -115,5 +117,36 @@ export const deleteInvoice = async (req, res) => {
     res.json({ message: "Invoice deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const emailReceipt = async (req, res) => {
+  try {
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+
+    // Check permission (only own receipt or admin)
+    if (req.user.role !== 'admin' && invoice.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    // Fetch full details
+    const items = await InvoiceItem.find({ invoiceId: invoice._id }).populate("productId", "name price");
+    const user = await User.findById(invoice.userId);
+
+    if (!user || !user.email) {
+      return res.status(400).json({ message: "User email not found" });
+    }
+
+    const orderData = { ...invoice.toObject(), items };
+    const previewUrl = await sendReceiptEmail(user, orderData);
+
+    res.json({
+      message: "Receipt emailed successfully!",
+      previewUrl // Useful for demo/Ethereal
+    });
+  } catch (err) {
+    console.error("Email error:", err);
+    res.status(500).json({ message: "Failed to send email" });
   }
 };
