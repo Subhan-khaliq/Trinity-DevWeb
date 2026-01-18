@@ -140,3 +140,45 @@ export const deleteReport = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+export const getDashboardStats = async (req, res) => {
+    try {
+        const totalSales = await Invoice.aggregate([
+            { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+        ]);
+
+        const countInvoices = await Invoice.countDocuments();
+        const countProducts = await Product.countDocuments();
+        const countUsers = await User.countDocuments({ role: 'customer' });
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const dailySales = await Invoice.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    sales: { $sum: "$totalAmount" }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        const recentOrders = await Invoice.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('userId', 'firstName lastName email');
+
+        res.json({
+            totalRevenue: totalSales[0]?.total || 0,
+            totalOrders: countInvoices,
+            totalProducts: countProducts,
+            totalCustomers: countUsers,
+            dailySales,
+            recentOrders
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};

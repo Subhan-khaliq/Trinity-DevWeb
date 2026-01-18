@@ -9,6 +9,7 @@ import productRoutes from "./routes/product.routes.js";
 import invoiceRoutes from "./routes/invoice.routes.js";
 import reportRoutes from "./routes/report.routes.js";
 import authRoutes from './routes/auth.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 import { swaggerUi, specs } from './config/swagger.js';
 
 import mongoSanitize from 'express-mongo-sanitize';
@@ -58,6 +59,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/reports", reportRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Coverage Reports Dashboard
 app.get('/coverage', (req, res) => {
