@@ -64,7 +64,6 @@ const Home = () => {
 
     const categories = ['Fruits', 'Vegetables', 'Dairy', 'Bakery', 'Snacks', 'Beverages', 'Pantry']; // Example categories or fetch dynamically
 
-    // Client-side search (server-side search could be added to the API too)
     const filteredProducts = products.filter(p =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.brand?.toLowerCase().includes(searchQuery.toLowerCase())

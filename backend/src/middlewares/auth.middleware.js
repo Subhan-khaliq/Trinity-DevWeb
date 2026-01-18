@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import tokenBlacklist from '../utils/tokenBlacklist.js';  // Add this import
+import tokenBlacklist from '../utils/tokenBlacklist.js';
 
 const authenticate = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];

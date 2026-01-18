@@ -1,10 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import tokenBlacklist from '../utils/tokenBlacklist.js';  // Add this import
+import tokenBlacklist from '../utils/tokenBlacklist.js';
 
-
-// In-memory blacklist for tokens (use Redis/DB in production)
-// const tokenBlacklist = new Set();
 
 export const register = async (req, res) => {
   try {
