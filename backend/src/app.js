@@ -22,7 +22,26 @@ const app = express();
 app.use(helmet({
   hsts: false, // Disable HSTS to avoid HTTPS issues on IP access
 }));
-app.use(mongoSanitize());
+
+// Custom NoSQL Injection Protection for Express 5
+// Since req.query is read-only in Express 5, we only sanitize req.body
+const sanitizeNosql = (req, res, next) => {
+  const sanitize = (obj) => {
+    if (obj instanceof Object) {
+      for (const key in obj) {
+        if (key.startsWith('$')) {
+          delete obj[key];
+        } else {
+          sanitize(obj[key]);
+        }
+      }
+    }
+  };
+  if (req.body) sanitize(req.body);
+  next();
+};
+
+app.use(sanitizeNosql);
 app.use(cors());
 app.use(express.json({ limit: '10kb' })); // Limit body size to prevent DoS
 
