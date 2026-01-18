@@ -26,32 +26,38 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
+    const {
+      page = 1,
+      limit = 12,
+      category,
+      sort,
+      isGlutenFree,
+      isVegan,
+      isVegetarian
+    } = req.query;
 
-    // If no pagination requested, return all
-    if (!page && !limit) {
-      const products = await Product.find().sort({ createdAt: -1 });
-      return res.json({
-        products,
-        currentPage: 1,
-        totalPages: 1,
-        totalProducts: products.length
-      });
-    }
+    const query = {};
+    if (category) query.category = category;
+    if (isGlutenFree === 'true') query.isGlutenFree = true;
+    if (isVegan === 'true') query.isVegan = true;
+    if (isVegetarian === 'true') query.isVegetarian = true;
 
-    const skip = ((page || 1) - 1) * (limit || 12);
-    const finalLimit = limit || 12;
+    let sortOption = { createdAt: -1 };
+    if (sort === 'price_asc') sortOption = { price: 1 };
+    if (sort === 'price_desc') sortOption = { price: -1 };
 
-    const total = await Product.countDocuments();
-    const products = await Product.find()
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const finalLimit = parseInt(limit);
+
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query)
       .skip(skip)
       .limit(finalLimit)
-      .sort({ createdAt: -1 });
+      .sort(sortOption);
 
     res.json({
       products,
-      currentPage: page || 1,
+      currentPage: parseInt(page),
       totalPages: Math.ceil(total / finalLimit),
       totalProducts: total
     });
@@ -107,6 +113,12 @@ export const syncWithOpenFoodFacts = async (req, res) => {
       picture: offData.image_url,
       category: offData.categories,
       nutritionalInformation: offData.nutriments,
+      labels: offData.labels_tags || [],
+      ingredients: offData.ingredients_text,
+      allergens: offData.allergens_tags || [],
+      isGlutenFree: offData.labels_tags?.some(tag => tag.includes('gluten-free')) || false,
+      isVegan: offData.labels_tags?.some(tag => tag.includes('vegan')) || false,
+      isVegetarian: offData.labels_tags?.some(tag => tag.includes('vegetarian')) || false,
       openFoodFactsData: offData,
       lastUpdatedFromAPI: new Date()
     };

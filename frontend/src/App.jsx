@@ -16,6 +16,7 @@ import Reports from './pages/admin/Reports';
 import CustomerOrders from './pages/public/CustomerOrders';
 import Customers from './pages/admin/Customers';
 import Profile from './pages/public/Profile';
+import ProductDetail from './pages/public/ProductDetail';
 import './index.css';
 
 // Protected Route Component
@@ -39,6 +40,7 @@ function App() {
               <Route element={<Layout />}>
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/orders" element={<ProtectedRoute><CustomerOrders /></ProtectedRoute>} />
                 <Route path="/login" element={<Login />} />
