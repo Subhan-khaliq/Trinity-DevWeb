@@ -21,6 +21,7 @@ const app = express();
 
 app.use(helmet({
   hsts: false, // Disable HSTS to avoid HTTPS issues on IP access
+  contentSecurityPolicy: false, // Disable CSP to allow Swagger UI's inline assets
 }));
 
 // Custom NoSQL Injection Protection for Express 5
