@@ -87,36 +87,39 @@ const ProductForm = () => {
                         <Input label="Category" name="category" value={formData.category} onChange={handleChange} />
                     </div>
                     <Input label="Picture URL" name="picture" value={formData.picture} onChange={handleChange} placeholder="https://example.com/image.jpg" />
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1rem' }}>
-                        <div style={{ flex: 1 }}>
-                            <Input label="Barcode" name="barcode" value={formData.barcode} onChange={handleChange} />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem', alignItems: 'start' }}>
+                        <Input label="Barcode" name="barcode" value={formData.barcode} onChange={handleChange} />
+                        <div style={{ paddingTop: '1.85rem' }}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                style={{ width: '120px' }}
+                                onClick={async () => {
+                                    if (!formData.barcode) return alert('Please enter a barcode first');
+                                    setLoading(true);
+                                    try {
+                                        const { data } = await api.post('/products/sync', {
+                                            barcode: formData.barcode,
+                                            shouldSave: false
+                                        });
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            name: data.name || prev.name,
+                                            brand: data.brand || prev.brand,
+                                            category: data.category || prev.category,
+                                            picture: data.picture || prev.picture
+                                        }));
+                                    } catch (error) {
+                                        alert(error.response?.data?.message || 'Failed to fetch details');
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                                disabled={loading}
+                            >
+                                Fetch Details
+                            </Button>
                         </div>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            style={{ marginBottom: '1.25rem' }}
-                            onClick={async () => {
-                                if (!formData.barcode) return alert('Please enter a barcode first');
-                                setLoading(true);
-                                try {
-                                    const { data } = await api.post('/products/sync', { barcode: formData.barcode });
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        name: data.name || prev.name,
-                                        brand: data.brand || prev.brand,
-                                        category: data.category || prev.category,
-                                        picture: data.picture || prev.picture
-                                    }));
-                                } catch (error) {
-                                    alert(error.response?.data?.message || 'Failed to fetch details');
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
-                            disabled={loading}
-                        >
-                            Fetch Details
-                        </Button>
                     </div>
 
                     <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
