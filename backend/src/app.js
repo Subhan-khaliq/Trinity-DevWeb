@@ -12,6 +12,8 @@ import reportRoutes from "./routes/report.routes.js";
 import authRoutes from './routes/auth.routes.js';
 import { swaggerUi, specs } from './config/swagger.js';
 
+import mongoSanitize from 'express-mongo-sanitize';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -20,8 +22,9 @@ const app = express();
 app.use(helmet({
   hsts: false, // Disable HSTS to avoid HTTPS issues on IP access
 }));
+app.use(mongoSanitize());
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10kb' })); // Limit body size to prevent DoS
 
 // ✅ ROOT ROUTE MUST BE HERE
 app.get("/", (req, res) => {
