@@ -93,7 +93,7 @@ export const deleteProduct = async (req, res) => {
 };
 
 export const syncWithOpenFoodFacts = async (req, res) => {
-  const { barcode } = req.body;
+  const { barcode, shouldSave = true } = req.body;
   if (!barcode) return res.status(400).json({ message: "Barcode is required" });
 
   try {
@@ -110,6 +110,11 @@ export const syncWithOpenFoodFacts = async (req, res) => {
       openFoodFactsData: offData,
       lastUpdatedFromAPI: new Date()
     };
+
+    if (!shouldSave) {
+      // Just return the mapped data without saving
+      return res.json({ ...updateData, barcode });
+    }
 
     let product = await Product.findOne({ barcode });
     if (product) {
