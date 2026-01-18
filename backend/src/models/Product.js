@@ -10,6 +10,12 @@ const productSchema = new mongoose.Schema(
     nutritionalInformation: { type: Map, of: String }, // Store key-value pairs like Energy: 100kcal
     availableQuantity: { type: Number, default: 0 },
     barcode: { type: String, unique: true },
+    labels: [String],
+    ingredients: String,
+    allergens: [String],
+    isGlutenFree: { type: Boolean, default: false },
+    isVegan: { type: Boolean, default: false },
+    isVegetarian: { type: Boolean, default: false },
     openFoodFactsData: { type: Object }, // Full JSON from API
     lastUpdatedFromAPI: Date,
   },
