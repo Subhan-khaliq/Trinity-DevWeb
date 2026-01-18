@@ -2,15 +2,31 @@ import Product from "../models/Product.js";
 
 // Fetch data from Open Food Facts
 const fetchOpenFoodFactsData = async (barcode) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
   try {
-    const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`External API returned status ${response.status}`);
+    }
+
     const data = await response.json();
-    if (data.status === 1) {
+    if (data.status === 1 && data.product) {
       return data.product;
     }
     return null;
   } catch (error) {
-    console.error("Error fetching from OFF:", error);
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      console.error("Open Food Facts API request timed out");
+    } else {
+      console.error("Error fetching from OFF:", error.message);
+    }
     return null;
   }
 };
@@ -106,15 +122,15 @@ export const syncWithOpenFoodFacts = async (req, res) => {
     const offData = await fetchOpenFoodFactsData(barcode);
     if (!offData) return res.status(404).json({ message: "Product not found on Open Food Facts" });
 
-    // Map OFF data to our model
+    // Map OFF data to our model with robust fallbacks
     const updateData = {
-      name: offData.product_name,
-      brand: offData.brands,
-      picture: offData.image_url,
-      category: offData.categories,
-      nutritionalInformation: offData.nutriments,
+      name: offData.product_name || "Unknown Product",
+      brand: offData.brands || "Unknown Brand",
+      picture: offData.image_url || "",
+      category: offData.categories?.split(',')[0] || "General",
+      nutritionalInformation: offData.nutriments || {},
       labels: offData.labels_tags || [],
-      ingredients: offData.ingredients_text,
+      ingredients: offData.ingredients_text || "No ingredients listed",
       allergens: offData.allergens_tags || [],
       isGlutenFree: offData.labels_tags?.some(tag => tag.includes('gluten-free')) || false,
       isVegan: offData.labels_tags?.some(tag => tag.includes('vegan')) || false,
