@@ -21,6 +21,10 @@
     "react-router-dom": "^7.12.0",
     "recharts": "^3.6.0"
   },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
+  },
   "devDependencies": {
     "@babel/core": "^7.28.6",
     "@babel/preset-env": "^7.28.6",
