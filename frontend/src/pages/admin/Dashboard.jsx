@@ -52,7 +52,7 @@ const Dashboard = () => {
             </div>
 
             {/* Stats Grid */}
-            <div style={{
+            <div id="tour-stats-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
                 gap: '1.5rem'

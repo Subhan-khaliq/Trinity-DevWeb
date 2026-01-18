@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
+import Button from '../../components/ui/Button';
 import styles from './Profile.module.css';
 
 const Profile = () => {
@@ -58,6 +59,24 @@ const Profile = () => {
                 </div>
             )}
             <form onSubmit={handleSubmit} className={styles.form}>
+                <div className={styles.section}>
+                    <h3 className={styles.sectionTitle}>Preferences</h3>
+                    <div style={{ padding: '1.5rem', background: 'var(--bg-color)', borderRadius: '12px' }}>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                            Need a refresher? You can restart the app tour anytime.
+                        </p>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                localStorage.removeItem('hasTakenTour');
+                                window.location.reload();
+                            }}
+                        >
+                            Retake the Tour
+                        </Button>
+                    </div>
+                </div>
+
                 <div className={styles.row}>
                     <div className={styles.field}>
                         <label htmlFor="firstName">First Name</label>
