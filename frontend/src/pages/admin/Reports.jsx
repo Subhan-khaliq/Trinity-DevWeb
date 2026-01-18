@@ -133,38 +133,30 @@ const Reports = () => {
                                     <div style={{ height: '350px', background: 'var(--surface-color)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                                         <h4 style={{ marginBottom: '1.5rem', fontSize: '1rem', color: 'var(--text-main)' }}>Revenue by Category</h4>
                                         <ResponsiveContainer width="100%" height="80%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={report.data.categoryRevenue}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    innerRadius={65}
-                                                    outerRadius={90}
-                                                    fill="#8884d8"
-                                                    paddingAngle={5}
-                                                    dataKey="value"
-                                                    labelLine={true}
-                                                    label={({ name, percent }) => {
-                                                        const truncatedName = name.length > 15 ? `${name.substring(0, 15)}...` : name;
-                                                        return `${truncatedName} ${(percent * 100).toFixed(0)}%`;
-                                                    }}
-                                                >
+                                            <BarChart
+                                                data={[...report.data.categoryRevenue].sort((a, b) => b.value - a.value)}
+                                                layout="vertical"
+                                                margin={{ left: 20, right: 30 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                                <XAxis type="number" tick={{ fontSize: 10 }} unit="$" />
+                                                <YAxis
+                                                    dataKey="name"
+                                                    type="category"
+                                                    width={120}
+                                                    tick={{ fontSize: 10 }}
+                                                    formatter={(value) => value.length > 15 ? `${value.substring(0, 15)}...` : value}
+                                                />
+                                                <Tooltip
+                                                    formatter={(value) => [`$${value.toFixed(2)}`, "Revenue"]}
+                                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                                                />
+                                                <Bar dataKey="value" radius={[0, 4, 4, 0]} name="Revenue" barSize={20}>
                                                     {report.data.categoryRevenue.map((entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                     ))}
-                                                </Pie>
-                                                <Tooltip
-                                                    formatter={(value, name) => [`$${value.toFixed(2)}`, name]}
-                                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                                                />
-                                                <Legend
-                                                    verticalAlign="bottom"
-                                                    height={36}
-                                                    formatter={(value) => {
-                                                        return <span style={{ fontSize: '10px' }}>{value.length > 20 ? `${value.substring(0, 20)}...` : value}</span>;
-                                                    }}
-                                                />
-                                            </PieChart>
+                                                </Bar>
+                                            </BarChart>
                                         </ResponsiveContainer>
                                     </div>
                                 )}
